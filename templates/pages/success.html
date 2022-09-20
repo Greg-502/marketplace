@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block navbar %}
+    {% include 'components/navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+    <div class="container mx-auto flex justify-center items-center flex-col p-4 pt-0">
+        <img class="w-24" src="{% static 'images/ok.gif' %}" alt="success purchase">
+        <h2 class="mt-4 font-semibold text-2xl">Success purchase</h2>
+        <p class="w-full md:max-w-sm text-center text-gray-500">Thanks for buy! We will send to your e-mail the bill with a resume of your item(s).</p>
+    </div>
+{% endblock content %}

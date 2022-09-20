@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    {% include 'components/navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+<div class="bg-white">
+    <div
+        class="mx-auto grid max-w-2xl grid-cols-1 gap-y-16 gap-x-8 py-4 px-4 sm:px-6 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
+        <div class="grid grid-cols-1 grid-rows-1 gap-4 sm:gap-6 lg:gap-8">
+            <img src="{{ object.thumbnail.url }}"
+                alt="{{ object }}"
+                class="rounded-lg w-full object-cover shadow-2xl"
+            >
+        </div>
+        <div>
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Details</h2>
+            <p class="mt-4 text-gray-500">{{ object.description|safe|truncatechars:235 }} <a class="font-semibold text-indigo-500" href="">Read more</a> </p>
+
+            <dl class="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-y-16 lg:gap-x-8">
+                <div class="border-t border-gray-200 pt-4">
+                    <dt class="font-medium text-gray-900">Song</dt>
+                    <dd class="mt-2 text-sm text-gray-500">{{ object }}</dd>
+                </div>
+
+                <div class="border-t border-gray-200 pt-4">
+                    <dt class="font-medium text-gray-900">Artist</dt>
+                    <dd class="mt-2 text-sm text-gray-500">Canserbero</dd>
+                </div>
+
+                <div class="border-t border-gray-200 pt-4">
+                    <dt class="font-medium text-gray-900">Year</dt>
+                    <dd class="mt-2 text-sm text-gray-500">2010</dd>
+                </div>
+
+                <div class="border-t border-gray-200 pt-4">
+                    <dt class="font-medium text-gray-900">Album</dt>
+                    <dd class="mt-2 text-sm text-gray-500">{{ object }} - Single</dd>
+                </div>
+                
+                
+                {% if not has_access %}    
+                <div class="border-t border-gray-200 pt-4">
+                    <dt class="font-medium text-gray-900">Price</dt>
+                    <dd class="mt-2 text-2xl font-bold text-indigo-500">${{ object.price_display }}</dd>
+                </div>
+                {% endif %}
+                    
+            </dl>
+
+            
+            {% if has_access %}
+            <dl class="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-y-16 lg:gap-x-8">
+                <a href="{{ object.content_file.url }}" download class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Download</a>
+            
+                <a href="{{ object.content_url }}" target="_blank" class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Visit URL</a>
+            </dl>
+            {% else %}    
+            <dl class="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 sm:gap-y-16 lg:gap-x-8">
+                {% csrf_token %}
+                <button type="submit" id="checkout-button" class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Buy Now</button>
+            </dl>
+            {% endif %}
+                
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+    // Create and instance of the stripe object with your publishable API key
+    var stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}');
+    
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
+    var checkoutButton = document.getElementById('checkout-button');
+
+    checkoutButton.addEventListener('click', function() {
+        //Create a new Checkout session using the server-side endpoint yout
+        //create in step 3
+
+
+        fetch("{% url 'create-checkout-session' object.slug %}", {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrftoken}
+        })
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(session){
+            console.log(session)
+            return stripe.redirectToCheckout({ sessionId: session.id });
+        })
+        .then(function(result){
+            // If 'redirectToCheckout' fails due to a browser or network
+            // error, you should display the localized error message to your
+            // customer using 'error.message'
+            if (result.error) {
+                alert(result.error.message);
+            }
+        })
+        .catch(function(error){
+            console.error('Error', error);
+        });
+    });
+</script>
+{% endblock js %}

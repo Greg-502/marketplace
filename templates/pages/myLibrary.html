@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+{% include 'components/navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+<div class="container mx-auto flex justify-center items-center p-4 pt-2">
+    <div class="flex-wrap w-full md:max-w-xl text-center">
+        <h1 class="block text-3xl tracking-tight font-extrabold text-gray-900 sm:text-4xl">{{ title }}</h1>
+        <p class="mt-4 font-light text-lg text-gray-500 tracking-wide">Download or visist your purchases.</p>
+    </div>
+</div>
+
+<div class="container mx-auto p-4 w-full md:max-w-4xl">
+    <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 text-center">
+                <tr>
+                    <th scope="col" class="py-3 px-6">
+                        THUMBNAIL
+                    </th>
+                    <th scope="col" class="py-3 px-6">
+                        name
+                    </th>
+                    <th scope="col" class="py-3 px-6">
+                        Download
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                
+                {% for product in object_list.products.all %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <th scope="row" class="flex py-3 justify-center">
+                            <div class="flex-shrink-0">
+                                <a href="{% url 'detail' product.slug %}">
+                                    <img class="h-12 rounded-full w-12 object-cover" src="{{ product.thumbnail.url }}"
+                                        alt="{{product.name}}">
+                                </a>
+                            </div>
+                        </th>
+                        <td class="py-4 px-6 capitalize">
+                            {{product.name}}
+                        </td>
+                        <td class="py-4 px-6">
+                            <a href="{{ product.content_file.url }}" download class="mb-2 flex mx-auto justify-center">
+                                <svg class="h-6 w-6 text-green-500" x-description="Heroicon name: outline/check" xmlns="http://www.w3.org/2000/svg" fill="#22c55e" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path d="M19 9h-4V3H9v6H5l7 8zM4 19h16v2H4z"></path>
+                                </svg>
+                            </a>
+
+                            {% if product.content_url %}
+                                <a href="{{ product.content_url }}" class="text-green-500 underline" target="_blank">URL</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                    
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock content %}

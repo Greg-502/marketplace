@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    {% include 'components/navbar.html' %}
+{% endblock navbar %}
+    
+{% block content %}
+    {% if user.is_staff %}
+        <div class="container mx-auto flex justify-center items-center p-4 pt-2">
+            <div class="flex-wrap w-full md:max-w-xl text-center">
+                <h1 class="block text-3xl tracking-tight font-extrabold text-gray-900 sm:text-4xl">{{ title }}</h1>
+                <p class="mt-4 font-light text-lg text-gray-500 tracking-wide">Edit your products?</p>
+                <p class="font-semibold text-lg text-gray-500 tracking-wide">Music, Games, Videos, Files, URLs.</p>
+            </div>
+        </div>
+
+        <!--POST MODAL-->
+        {% include 'pages/forms/form.html' %}
+        <!-- END POST MODAL -->
+    </div>
+    {% endif %}
+{% endblock content %}
